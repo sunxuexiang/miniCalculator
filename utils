@@ -1,0 +1,126 @@
+package com.yun;
+
+import java.util.*;
+
+import javax.swing.text.html.HTMLDocument.Iterator;
+
+public class Utils {
+
+    public static final Integer TWENTY_SIX = 26;
+    public static final Integer ONE = 1;
+    public static final Integer TWO = 2;
+    public static final Integer SEVEN = 7;
+    public static final Integer EIGHT = 8;
+    public static final Integer NINE = 9;
+    public static final Integer ZERO = 0;
+    public static Map<Integer,List<Character>> comMap = new HashMap<>();
+
+    static {
+        getMap(1,0,0);
+    }
+    /**
+    * @author sunxuexiang
+    * @desc get 26 english letters
+    */
+    public static List<Character> getLetters () {
+        List<Character> arrayList = new ArrayList<Character>();
+        for(int i = 1;i<=TWENTY_SIX;i++){
+            //大写
+            arrayList.add(Character.toUpperCase((char)(96+i)));
+        }
+        return arrayList;
+    }
+    
+    /**
+     * @param index : keyBoard
+     * @param start : 26 starting bits of english words
+     * @param end : 26 ending bits of english words
+     * @author sunxuexinag
+     * @desc Assemble calculator 2-9 keyboard corresponding to English words
+     */
+    public static void getMap (int index,int start,int end) {
+        if (index == ONE) {
+            comMap.put(index,null);
+        } else {
+            if (index == TWO) {
+                end = index + 1;
+            } else if (index == SEVEN || index == EIGHT) {
+                end+=1;
+            } else if (index == NINE) {
+                end+=2;
+            }
+            List<Character> characters = getLetters().subList(start, end);
+            comMap.put(index,characters);
+            if (index == NINE) {
+                return;
+            }
+            start = end;
+            end = 3*index;
+        }
+        ++index;
+        getMap(index,start,end);
+    }
+
+    
+    /**
+     * @param integers : an array that receives user input
+     * @author sunxuexiang
+     * @desc load the array passed by the user and get the corresponding
+     * english data of the combination
+     * */
+    public static void loadData (Integer[]integers) {
+        List<String[]> countList = new ArrayList<>();
+        for (Integer integer : integers) {
+            List<Character> characters = comMap.get(integer);
+            String []array = new String[characters.size()];
+            for (int i = 0; i < characters.size(); i++) {
+				array[i] = characters.get(i).toString();
+			}
+            countList.add(array);
+        }
+        List<String[]> list = comData(countList,0,null);
+        list.forEach(item->{
+        	System.out.print(" ");
+        	for(int i=0;i<item.length;i++) {
+        		System.out.print(item[i]);
+        	}
+        });
+    }
+
+    /**
+     * @param countList: the letter set array corresponding to the number input by the user
+     * @param index : loop index
+     * @param resultList : the resule set obtained by each recursion
+     * @author sunxuexiang
+     * @desc using recursive method to assemble every data
+     * */
+    public static List<String[]> comData (List<String[]> countList, int index, List<String[]> resultList) {
+    	if(index==countList.size()){
+            return resultList;
+        }
+    	 List<String[]> list=new ArrayList<String[]>();
+         if(index==0){
+             String[] dataArr=countList.get(index);
+             for(String arr : dataArr){
+            	 list.add(new String[]{arr});
+             }
+         }else{
+             String[] dataArr=countList.get(index);
+             for(String[] array: resultList){
+                 for(String arr : dataArr){
+                     String[] arrcopy=new String[array.length+1];
+                     System.arraycopy(array, ZERO, arrcopy, ZERO, array.length);
+                     arrcopy[arrcopy.length-1]=arr;
+                     list.add(arrcopy);
+                 }
+             }
+         }
+          return comData(countList,++index,list);
+    }
+   
+    public static void main(String[] args) {
+    	loadData(new Integer[]{2,3,4});
+	}
+    
+
+}
